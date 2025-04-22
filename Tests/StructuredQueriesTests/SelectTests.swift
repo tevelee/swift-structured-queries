@@ -16,6 +16,7 @@ extension SnapshotTests {
       _ = Reminder.where(\.isCompleted).select(\.id)
       _ = Reminder.where(\.isCompleted).select { $0.id }
       _ = Reminder.where(\.isCompleted).select { ($0.id, $0.isCompleted) }
+      _ = Reminder.order { ($0.id.desc(), $0.title.asc()) }
     }
 
     @Test func selectAll() {

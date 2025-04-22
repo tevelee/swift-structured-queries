@@ -30,7 +30,7 @@ extension QueryFragmentBuilder<Bool> {
 }
 
 extension QueryFragmentBuilder<()> {
-  public static func buildExpression<each C: QueryExpression>(
+  public static func buildExpression<each C: OrderExpression>(
     _ expression: (repeat each C)
   ) -> [QueryFragment] {
     Array(repeat each expression)

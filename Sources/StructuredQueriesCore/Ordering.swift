@@ -1,9 +1,9 @@
-extension QueryExpression where QueryValue: QueryBindable {
+extension OrderableExpression {
   /// This expression with an ascending ordering term.
   ///
   /// - Parameter nullOrdering: `NULL`-specific ordering.
   /// - Returns: An ascending ordering of this expression.
-  public func asc(nulls nullOrdering: NullOrdering? = nil) -> some QueryExpression {
+  public func asc(nulls nullOrdering: NullOrdering? = nil) -> some OrderExpression {
     OrderingTerm(base: self, direction: .asc, nullOrdering: nullOrdering)
   }
 
@@ -11,10 +11,13 @@ extension QueryExpression where QueryValue: QueryBindable {
   ///
   /// - Parameter nullOrdering: `NULL`-specific ordering.
   /// - Returns: A descending ordering of this expression.
-  public func desc(nulls nullOrdering: NullOrdering? = nil) -> some QueryExpression {
+  public func desc(nulls nullOrdering: NullOrdering? = nil) -> some OrderExpression {
     OrderingTerm(base: self, direction: .desc, nullOrdering: nullOrdering)
   }
 }
+
+/// An expression that can be used in ORDER BY.
+public protocol OrderExpression: QueryExpression {}
 
 /// `NULL`-specific ordering for an ordering term.
 public struct NullOrdering: RawRepresentable, Sendable {
@@ -31,7 +34,7 @@ public struct NullOrdering: RawRepresentable, Sendable {
   }
 }
 
-private struct OrderingTerm: QueryExpression {
+private struct OrderingTerm: OrderExpression {
   typealias QueryValue = Never
 
   struct Direction {
@@ -44,7 +47,7 @@ private struct OrderingTerm: QueryExpression {
   let direction: Direction
   let nullOrdering: NullOrdering?
 
-  init(base: some QueryExpression, direction: Direction, nullOrdering: NullOrdering?) {
+  init(base: some OrderableExpression, direction: Direction, nullOrdering: NullOrdering?) {
     self.base = base.queryFragment
     self.direction = direction
     self.nullOrdering = nullOrdering

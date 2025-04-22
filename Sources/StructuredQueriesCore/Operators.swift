@@ -694,7 +694,7 @@ extension QueryExpression where QueryValue == String {
   ///
   /// - Parameter collation: A collating sequence name.
   /// - Returns: An expression that is compared using the given collating sequence.
-  public func collate(_ collation: Collation) -> some QueryExpression<QueryValue> {
+  public func collate(_ collation: Collation) -> some QueryExpression<QueryValue> & OrderableExpression {
     BinaryOperator(lhs: self, operator: "COLLATE", rhs: collation)
   }
 
@@ -724,7 +724,7 @@ extension QueryExpression where QueryValue == String {
   ///   - pattern: A string expression describing the `LIKE` pattern.
   ///   - escape: An optional character for the `ESCAPE` clause.
   /// - Returns: A predicate expression.
-  public func like(_ pattern: QueryValue, escape: Character? = nil) -> some QueryExpression<Bool> {
+  public func like(_ pattern: QueryValue, escape: Character? = nil) -> some QueryExpression<Bool> & OrderableExpression {
     LikeOperator(string: self, pattern: pattern, escape: escape)
   }
 
@@ -752,7 +752,7 @@ extension QueryExpression where QueryValue == String {
   ///
   /// - Parameter other: A string expression describing the prefix.
   /// - Returns: A predicate expression.
-  public func hasPrefix(_ other: QueryValue) -> some QueryExpression<Bool> {
+  public func hasPrefix(_ other: QueryValue) -> some QueryExpression<Bool> & OrderableExpression {
     like("\(other)%")
   }
 
@@ -766,7 +766,7 @@ extension QueryExpression where QueryValue == String {
   ///
   /// - Parameter other: A string expression describing the suffix.
   /// - Returns: A predicate expression.
-  public func hasSuffix(_ other: QueryValue) -> some QueryExpression<Bool> {
+  public func hasSuffix(_ other: QueryValue) -> some QueryExpression<Bool> & OrderableExpression {
     like("%\(other)")
   }
 
@@ -781,7 +781,7 @@ extension QueryExpression where QueryValue == String {
   /// - Parameter other: A string expression describing the infix.
   /// - Returns: A predicate expression.
   @_disfavoredOverload
-  public func contains(_ other: QueryValue) -> some QueryExpression<Bool> {
+  public func contains(_ other: QueryValue) -> some QueryExpression<Bool> & OrderableExpression {
     like("%\(other)%")
   }
 }
@@ -935,7 +935,7 @@ private struct UnaryOperator<QueryValue>: QueryExpression {
   }
 }
 
-struct BinaryOperator<QueryValue>: QueryExpression {
+struct BinaryOperator<QueryValue>: QueryExpression, OrderableExpression {
   let lhs: QueryFragment
   let `operator`: QueryFragment
   let rhs: QueryFragment
@@ -958,7 +958,7 @@ struct BinaryOperator<QueryValue>: QueryExpression {
 private struct LikeOperator<
   LHS: QueryExpression<String>,
   RHS: QueryExpression<String>
->: QueryExpression {
+>: QueryExpression, OrderableExpression {
   typealias QueryValue = Bool
 
   let string: LHS
